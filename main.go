@@ -30,12 +30,9 @@ func main() {
 		case strings.HasPrefix(request.RequestURI, "/assets/"):
 			http.ServeFile(writer, request, "public/"+request.URL.Path)
 			break
-		case strings.HasPrefix(request.RequestURI, "/qbitbaka"):
-			http.ServeFile(writer, request, "public/index.html")
-			break
-		case strings.HasPrefix(request.RequestURI, "/api/data/torrents/"):
+		case strings.HasPrefix(request.RequestURI, "/qbitbaka/api/data/torrents/"):
 			writer.Header().Add("Content-Type", "application/json")
-			hash := strings.SplitAfter(request.RequestURI, "/api/data/torrents/")[1]
+			hash := strings.SplitAfter(request.RequestURI, "/qbitbaka/api/data/torrents/")[1]
 			output, err := json.Marshal(qBit.GetTorrent(hash))
 			if err != nil {
 				io.WriteString(writer, "{}")
@@ -43,13 +40,16 @@ func main() {
 				writer.Write(output)
 			}
 			break
-		case strings.HasPrefix(request.RequestURI, "/api/data"):
+		case strings.HasPrefix(request.RequestURI, "/qbitbaka/api/data"):
 			output, err := json.Marshal(qBit.GetData())
 			if err != nil {
 				io.WriteString(writer, "{}")
 			} else {
 				writer.Write(output)
 			}
+			break
+		case strings.HasPrefix(request.RequestURI, "/qbitbaka"):
+			http.ServeFile(writer, request, "public/index.html")
 			break
 		default:
 			http.Redirect(writer, request, "/qbitbaka", http.StatusTemporaryRedirect)
