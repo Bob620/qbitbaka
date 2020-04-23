@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"strings"
+
+	"github.com/bob620/qbitbaka/src/server/qbit"
+	"github.com/bob620/qbitbaka/src/server/ws"
 )
 
 func main() {
-	qBit := NewQBit()
+	qBit := qbit.NewQBit()
+	socket := ws.CreateWs()
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		// Read in and process the request body
@@ -21,6 +24,9 @@ func main() {
 		}
 
 		switch {
+		case strings.HasPrefix(request.RequestURI, "/sockets"):
+			socket.Handler(writer, request)
+			break
 		case strings.HasPrefix(request.RequestURI, "/assets/"):
 			http.ServeFile(writer, request, "public/"+request.URL.Path)
 			break
@@ -50,35 +56,6 @@ func main() {
 			break
 		}
 	})
-
-	// Spawn goroutine to handle websockets
-	go func() {
-		ln, _ := net.Listen("tcp", ":9081")
-
-		for {
-			conn, _ := ln.Accept()
-
-			// Spawn goroutine for each connection made to the websocket
-			go func() {
-				for {
-					data := make([]byte, 1024)
-
-					length, err := conn.Read(data)
-					if err != nil {
-						// Kill a dead connection or restart an existing one from an EOF error loop
-						// It should work for the provided python3 client
-						_ = conn.Close()
-						break
-					}
-
-					// If we have a request
-					if length > 0 {
-						json.Unmarshal(data)
-					}
-				}
-			}()
-		}
-	}()
 
 	fmt.Println("Listening on :9080")
 	_ = http.ListenAndServe(":9080", nil)

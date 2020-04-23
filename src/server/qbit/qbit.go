@@ -1,4 +1,4 @@
-package main
+package qbit
 
 import (
 	"compress/gzip"
