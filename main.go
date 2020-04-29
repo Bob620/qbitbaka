@@ -1,19 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
+	"github.com/bob620/qbitbaka/src/server/chewyroll"
 	"github.com/bob620/qbitbaka/src/server/qbit"
+	"github.com/bob620/qbitbaka/src/server/routes"
 	"github.com/bob620/qbitbaka/src/server/ws"
 )
 
 func main() {
 	qBit := qbit.NewQBit()
+	cr := chewyroll.MakeChewyroll()
 	socket := ws.CreateWs()
+
+	qRoute := routes.MakeQbitBakaRoute(qBit)
+	cRoute := routes.MakeChewyrollRoute(cr)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		// Read in and process the request body
@@ -23,33 +28,26 @@ func main() {
 			fmt.Println("error:", err)
 		}
 
+		url := request.RequestURI
+
+		// Root /
 		switch {
-		case strings.HasPrefix(request.RequestURI, "/sockets"):
+		// /socket
+		case strings.HasPrefix(url, "/sockets"):
 			socket.Handler(writer, request)
 			break
-		case strings.HasPrefix(request.RequestURI, "/assets/"):
+		// /assets
+		case strings.HasPrefix(url, "/assets/"):
 			http.ServeFile(writer, request, "public/"+request.URL.Path)
 			break
-		case strings.HasPrefix(request.RequestURI, "/qbitbaka/api/data/torrents/"):
-			writer.Header().Add("Content-Type", "application/json")
-			hash := strings.SplitAfter(request.RequestURI, "/qbitbaka/api/data/torrents/")[1]
-			output, err := json.Marshal(qBit.GetTorrent(hash))
-			if err != nil {
-				io.WriteString(writer, "{}")
-			} else {
-				writer.Write(output)
-			}
+		// /qbitbaka
+		case strings.HasPrefix(url, "/qbitbaka"):
+			url = url[9:]
+			qRoute.QbitBaka(url, writer, request)
 			break
-		case strings.HasPrefix(request.RequestURI, "/qbitbaka/api/data"):
-			output, err := json.Marshal(qBit.GetData())
-			if err != nil {
-				io.WriteString(writer, "{}")
-			} else {
-				writer.Write(output)
-			}
-			break
-		case strings.HasPrefix(request.RequestURI, "/qbitbaka"):
-			http.ServeFile(writer, request, "public/index.html")
+		case strings.HasPrefix(url, "/chewyroll"):
+			url = url[10:]
+			cRoute.Chewyroll(url, writer, request)
 			break
 		default:
 			http.Redirect(writer, request, "/qbitbaka", http.StatusTemporaryRedirect)
