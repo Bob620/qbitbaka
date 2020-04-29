@@ -1,6 +1,7 @@
 package chewyroll
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/url"
@@ -22,7 +23,7 @@ func MakeChewyroll() *Chewyroll {
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
-	defer conn.Close()
+
 	rpcClient := rpc.CreateBakaRpc(rpc.MakeSocketReaderChan(conn), rpc.MakeSocketWriterChan(conn))
 	cr := Chewyroll{rpcClient}
 	cr.authenticate("")
@@ -35,21 +36,72 @@ func (cr *Chewyroll) authenticate(code string) {
 		&parameters.StringParam{Default: code},
 	}))
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("CR Auth Error:", err)
 	}
 }
 
-func (cr *Chewyroll) SeriesLookup(url string) []byte {
-	fmt.Println("Looking up", url)
+func (cr *Chewyroll) SeriesLookup(url string) *json.RawMessage {
 	res, err := cr.client.CallMethod(nil, "series.lookup", parameters.NewParametersByPosition([]parameters.Param{
 		&parameters.StringParam{Default: url},
 	}))
 	if err != nil {
 		fmt.Println(err)
-		return []byte("{}")
+		return nil
 	}
-	resJson, _ := res.MarshalJSON()
+	return res
+}
 
-	fmt.Println(resJson)
-	return resJson
+func (cr *Chewyroll) SeriesUpdate(uuid string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.update", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: uuid},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) SeriesDownload(uuid string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.download", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: uuid},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) EpisodesLookup(uuid string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "episodes.lookup", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: uuid},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) EpisodesUpdate(uuid string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "episodes.update", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: uuid},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) EpisodesDownload(uuid string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "episodes.download", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: uuid},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
 }

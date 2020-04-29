@@ -36,6 +36,36 @@ func (cRoute *ChewyrollRoute) ChewyrollApi(path string) []byte {
 		if err == nil {
 			return output
 		}
+	case strings.HasPrefix(path, "/series/update/"):
+		uuid := strings.SplitAfter(path, "/series/update/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesUpdate(uuid))
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/series/download/"):
+		uuid := strings.SplitAfter(path, "/series/download/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesDownload(uuid))
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/episodes/lookup/"):
+		uuid := strings.SplitAfter(path, "/episodes/lookup/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.EpisodesLookup(uuid))
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/episodes/update/"):
+		uuid := strings.SplitAfter(path, "/episodes/update/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.EpisodesUpdate(uuid))
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/episodes/download/"):
+		uuid := strings.SplitAfter(path, "/episodes/download/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.EpisodesDownload(uuid))
+		if err == nil {
+			return output
+		}
 	}
 	return []byte("{}")
 }
