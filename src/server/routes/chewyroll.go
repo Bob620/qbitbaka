@@ -30,24 +30,52 @@ func (cRoute *ChewyrollRoute) Chewyroll(path string, writer http.ResponseWriter,
 
 func (cRoute *ChewyrollRoute) ChewyrollApi(path string) []byte {
 	switch {
-	case strings.HasPrefix(path, "/series/lookup/"):
-		url := strings.SplitAfter(path, "/series/lookup/")[1]
-		output, err := json.Marshal(cRoute.chewyroll.SeriesLookup("https://crunchyroll.com/" + url))
+	case strings.HasPrefix(path, "/series/search/name"):
+		name := strings.SplitAfter(path, "/series/search/name/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesSearchByName(name))
 		if err == nil {
 			return output
 		}
+	case strings.HasPrefix(path, "/series/search/id"):
+		id := strings.SplitAfter(path, "/series/search/id/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesSearchById(id))
+		if err == nil {
+			return output
+		}
+
+	case strings.HasPrefix(path, "/series/lookup/id"):
+		id := strings.SplitAfter(path, "/series/lookup/id/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesLookupById(id))
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/series/lookup/uuid"):
+		uuid := strings.SplitAfter(path, "/series/lookup/uuid/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesLookupByUuid(uuid))
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/series/lookup/url"):
+		url := strings.SplitAfter(path, "/series/lookup/url/")[1]
+		output, err := json.Marshal(cRoute.chewyroll.SeriesLookupByUrl("https://crunchyroll.com/" + url))
+		if err == nil {
+			return output
+		}
+
 	case strings.HasPrefix(path, "/series/update/"):
 		uuid := strings.SplitAfter(path, "/series/update/")[1]
 		output, err := json.Marshal(cRoute.chewyroll.SeriesUpdate(uuid))
 		if err == nil {
 			return output
 		}
+
 	case strings.HasPrefix(path, "/series/download/"):
 		uuid := strings.SplitAfter(path, "/series/download/")[1]
 		output, err := json.Marshal(cRoute.chewyroll.SeriesDownload(uuid))
 		if err == nil {
 			return output
 		}
+
 	case strings.HasPrefix(path, "/episodes/lookup/"):
 		uuid := strings.SplitAfter(path, "/episodes/lookup/")[1]
 		output, err := json.Marshal(cRoute.chewyroll.EpisodesLookup(uuid))

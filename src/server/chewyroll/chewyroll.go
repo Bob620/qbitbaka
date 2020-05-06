@@ -40,9 +40,53 @@ func (cr *Chewyroll) authenticate(code string) {
 	}
 }
 
-func (cr *Chewyroll) SeriesLookup(url string) *json.RawMessage {
-	res, err := cr.client.CallMethod(nil, "series.lookup", parameters.NewParametersByPosition([]parameters.Param{
+func (cr *Chewyroll) SeriesLookupById(id string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.lookup.id", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: id},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) SeriesLookupByUuid(uuid string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.lookup.uuid", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: uuid},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) SeriesLookupByUrl(url string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.lookup.url", parameters.NewParametersByPosition([]parameters.Param{
 		&parameters.StringParam{Default: url},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) SeriesSearchById(id string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.search.id", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: id},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) SeriesSearchByName(name string) *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "series.search.name", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{Default: name},
 	}))
 	if err != nil {
 		fmt.Println(err)
@@ -63,7 +107,7 @@ func (cr *Chewyroll) SeriesUpdate(uuid string) *json.RawMessage {
 }
 
 func (cr *Chewyroll) SeriesDownload(uuid string) *json.RawMessage {
-	res, err := cr.client.CallMethod(nil, "series.download", parameters.NewParametersByPosition([]parameters.Param{
+	res, err := cr.client.CallMethod(nil, "series.queueDownload", parameters.NewParametersByPosition([]parameters.Param{
 		&parameters.StringParam{Default: uuid},
 	}))
 	if err != nil {
