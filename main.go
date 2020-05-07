@@ -14,7 +14,7 @@ import (
 
 func main() {
 	qBit := qbit.NewQBit()
-	cr := chewyroll.MakeChewyroll()
+	cr := chewyroll.MakeChewyroll("localhost:7000")
 	socket := ws.CreateWs()
 
 	qRoute := routes.MakeQbitBakaRoute(qBit)
