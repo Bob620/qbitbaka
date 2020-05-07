@@ -3,8 +3,9 @@ package chewyroll
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	uuid "github.com/nu7hatch/gouuid"
 	"net/url"
+	"time"
 
 	"github.com/bob620/baka-rpc-go/parameters"
 	"github.com/bob620/baka-rpc-go/rpc"
@@ -12,23 +13,43 @@ import (
 )
 
 type Chewyroll struct {
+	url    url.URL
+	conn   *websocket.Conn
 	client *rpc.BakaRpc
 }
 
-func MakeChewyroll() *Chewyroll {
-	u := url.URL{Scheme: "ws", Host: "localhost:7000", Path: "/"}
-	fmt.Println("Chewyroll:", u.String())
-
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		log.Fatal("dial:", err)
-	}
-
-	rpcClient := rpc.CreateBakaRpc(rpc.MakeSocketReaderChan(conn), rpc.MakeSocketWriterChan(conn))
-	cr := Chewyroll{rpcClient}
-	cr.authenticate("")
+func MakeChewyroll(host string) *Chewyroll {
+	cr := Chewyroll{url.URL{Scheme: "ws", Host: host, Path: "/"}, nil, rpc.CreateBakaRpc(nil, nil)}
+	cr.init()
 
 	return &cr
+}
+
+func (cr *Chewyroll) init() {
+	if cr.conn != nil {
+		fmt.Println("Closing hanging Chewyroll connection...")
+		_ = cr.conn.Close()
+	}
+
+	fmt.Println("Connecting to Chewyroll:", cr.url.String())
+
+	conn, _, err := websocket.DefaultDialer.Dial(cr.url.String(), nil)
+	if err != nil {
+		fmt.Println("Unable to connect to Chewyroll, retrying in 5 seconds...")
+		time.AfterFunc(5*time.Second, cr.init)
+		return
+	}
+
+	cr.conn = conn
+	cr.client.RemoveChannels(nil)
+	cr.client.AddChannels(rpc.MakeSocketReaderChan(conn), rpc.MakeSocketWriterChan(conn))
+
+	cr.client.HandleDisconnect(func(uuid *uuid.UUID) {
+		fmt.Println("Lost connection to Chewyroll, restarting websocket in 5 seconds...")
+		time.AfterFunc(5*time.Second, cr.init)
+	})
+	fmt.Println("Connected to Chewyroll, authenticating...")
+	cr.authenticate("")
 }
 
 func (cr *Chewyroll) authenticate(code string) {
@@ -38,6 +59,7 @@ func (cr *Chewyroll) authenticate(code string) {
 	if err != nil {
 		fmt.Println("CR Auth Error:", err)
 	}
+	fmt.Println("Chewyroll authenticated")
 }
 
 func (cr *Chewyroll) SeriesLookupById(id string) *json.RawMessage {
