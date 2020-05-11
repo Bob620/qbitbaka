@@ -38,7 +38,7 @@ func main() {
 			break
 		// /assets
 		case strings.HasPrefix(url, "/assets/"):
-			http.ServeFile(writer, request, "public/"+request.URL.Path)
+			http.ServeFile(writer, request, "public"+request.URL.Path)
 			break
 		// /qbitbaka
 		case strings.HasPrefix(url, "/qbitbaka"):
@@ -49,8 +49,11 @@ func main() {
 			url = url[10:]
 			cRoute.Chewyroll(url, writer, request)
 			break
+		case strings.HasPrefix(url, "/login"):
+			http.ServeFile(writer, request, "html/root/login.html")
+			break
 		default:
-			http.Redirect(writer, request, "/qbitbaka", http.StatusTemporaryRedirect)
+			http.Redirect(writer, request, "/login", http.StatusTemporaryRedirect)
 			break
 		}
 	})
