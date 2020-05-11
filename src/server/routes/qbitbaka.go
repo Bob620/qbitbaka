@@ -23,7 +23,7 @@ func (qRoute *QbitBakaRoute) QbitBaka(path string, writer http.ResponseWriter, r
 		writer.Write(qRoute.QbitBakaApi(path[4:]))
 		break
 	default:
-		http.ServeFile(writer, request, "public/index.html")
+		http.ServeFile(writer, request, "html/qbit/index.html")
 		break
 	}
 }

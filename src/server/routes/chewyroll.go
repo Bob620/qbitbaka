@@ -22,8 +22,11 @@ func (cRoute *ChewyrollRoute) Chewyroll(path string, writer http.ResponseWriter,
 		writer.Header().Add("Content-Type", "application/json")
 		writer.Write(cRoute.ChewyrollApi(path[4:]))
 		break
+		//	case strings.HasPrefix(path, "/"):
+		//		writer.Header().Add("Content-Type", "text/html; charset=utf-8")
+		//		break
 	default:
-		http.ServeFile(writer, request, "public/index.html")
+		http.ServeFile(writer, request, "html/cr/index.html")
 		break
 	}
 }
@@ -91,6 +94,33 @@ func (cRoute *ChewyrollRoute) ChewyrollApi(path string) []byte {
 	case strings.HasPrefix(path, "/episodes/download/"):
 		uuid := strings.SplitAfter(path, "/episodes/download/")[1]
 		output, err := json.Marshal(cRoute.chewyroll.EpisodesDownload(uuid))
+		if err == nil {
+			return output
+		}
+
+	case strings.HasPrefix(path, "/cr/listing/update"):
+		output, err := json.Marshal(cRoute.chewyroll.CRListingUpdate())
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/cr/season/update"):
+		output, err := json.Marshal(cRoute.chewyroll.CRSeasonUpdate())
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/cr/season/get"):
+		output, err := json.Marshal(cRoute.chewyroll.CRSeasonGet())
+		if err == nil {
+			return output
+		}
+
+	case strings.HasPrefix(path, "/mal/season/update"):
+		output, err := json.Marshal(cRoute.chewyroll.MalSeasonUpdate())
+		if err == nil {
+			return output
+		}
+	case strings.HasPrefix(path, "/mal/season/get"):
+		output, err := json.Marshal(cRoute.chewyroll.MalSeasonGet())
 		if err == nil {
 			return output
 		}

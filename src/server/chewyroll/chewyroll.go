@@ -171,3 +171,58 @@ func (cr *Chewyroll) EpisodesDownload(uuid string) *json.RawMessage {
 	}
 	return res
 }
+
+func (cr *Chewyroll) CRListingUpdate() *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "cr.listing.update", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) CRSeasonUpdate() *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "cr.season.update", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) CRSeasonGet() *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "cr.season.get", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) MalSeasonUpdate() *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "mal.season.update", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
+
+func (cr *Chewyroll) MalSeasonGet() *json.RawMessage {
+	res, err := cr.client.CallMethod(nil, "mal.season.get", parameters.NewParametersByPosition([]parameters.Param{
+		&parameters.StringParam{},
+	}))
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return res
+}
