@@ -38,6 +38,9 @@ func main() {
 			break
 		// /assets
 		case strings.HasPrefix(url, "/assets/"):
+			if strings.HasSuffix(request.URL.Path, ".js") {
+				writer.Header().Add("Content-Type", "application/javascript")
+			}
 			http.ServeFile(writer, request, "public"+request.URL.Path)
 			break
 		// /qbitbaka

@@ -12,4 +12,24 @@ html(lang="en")
         script(src="/assets/js/cr/index.js")
     body
         +header
+        section#subheader
+            div
+                h3 Chewyroll
+            div
+                form#search
+                    input(name="search", type="text", placeholder="search")
         section#main
+            div#info
+                div
+                    h2.title
+                    div
+                        img.header-image
+                        div
+                            progress(value="0", max="100").download-progress
+                            input(name="update", type="submit", value="Update").update-button
+                            input(name="download", type="submit", value="Download").download-button
+                div
+                    div
+                        p.description
+            div#list
+                form#items
